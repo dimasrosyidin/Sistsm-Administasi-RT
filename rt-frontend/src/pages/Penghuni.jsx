@@ -3,6 +3,7 @@ import api from '../api';
 import { exportToExcel, exportToPDF } from '../utils/export';
 import useTitle from '../utils/useTitle';
 import { Eye, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Penghuni() {
   useTitle('Data Penghuni');
@@ -17,6 +18,13 @@ export default function Penghuni() {
     status_pernikahan: 'Belum Menikah',
     foto_ktp: null,
     rumah_id: ''
+  });
+
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
   });
 
   const [filterStatus, setFilterStatus] = useState('Semua');
@@ -104,14 +112,17 @@ export default function Penghuni() {
       if (formData.id) {
         data.append('_method', 'PUT'); // Laravel way to handle PUT with FormData
         await api.post(`/penghuni/${formData.id}`, data, { headers: { 'Content-Type': 'multipart/form-data' }});
+        toast.success('Data Penghuni Berhasil di Update');
       } else {
         await api.post('/penghuni', data, { headers: { 'Content-Type': 'multipart/form-data' }});
+        toast.success('Data Penghuni Berhasil di Tambah');
       }
       setShowModal(false);
       setFormData({ id: null, nama_lengkap: '', status_penghuni: 'Tetap', nomor_telepon: '', status_pernikahan: 'Belum Menikah', foto_ktp: null, rumah_id: '' });
       fetchPenghuni();
     } catch (error) {
       console.error(error);
+      toast.error('Gagal menyimpan data');
     }
   };
 
@@ -133,19 +144,25 @@ export default function Penghuni() {
   const [selectedPenghuni, setSelectedPenghuni] = useState(null);
 
   const handleDelete = async (id) => {
-    if(confirm('Apakah Anda yakin ingin menghapus penghuni ini?')) {
-      try {
-        await api.delete(`/penghuni/${id}`);
-        fetchPenghuni();
-      } catch (error) {
-        alert(error.response?.data?.message || 'Gagal menghapus penghuni');
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Penghuni',
+      message: 'Apakah Anda yakin ingin menghapus penghuni ini?',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/penghuni/${id}`);
+          toast.success('Data Berhasil di Hapus');
+          fetchPenghuni();
+        } catch (error) {
+          toast.error(error.response?.data?.message || 'Gagal menghapus penghuni');
+        }
       }
-    }
+    });
   };
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 animate-slide-down stagger-1">
         <h2 className="text-2xl font-bold text-gray-800">Data Penghuni</h2>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <input 
@@ -176,7 +193,7 @@ export default function Penghuni() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden animate-slide-down stagger-2">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
@@ -238,9 +255,9 @@ export default function Penghuni() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <h3 className="text-xl font-bold mb-4">{formData.id ? 'Edit Penghuni' : 'Tambah Penghuni'}</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl animate-pop-in">
+            <h3 className="text-xl font-bold mb-4">{formData.id ? 'Edit Penghuni' : 'Tambah Penghuni Baru'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
@@ -289,8 +306,8 @@ export default function Penghuni() {
       {/* Modal View Detail */}
       {showViewModal && selectedPenghuni && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2">Detail Penghuni</h3>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl animate-pop-in">
+            <h3 className="text-xl font-bold mb-4">Detail Penghuni</h3>
             <div className="space-y-3 text-sm">
               <div className="flex flex-col">
                 <span className="text-gray-500">Nama Lengkap</span>
@@ -325,6 +342,33 @@ export default function Penghuni() {
           </div>
         </div>
       )}
+
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl text-center transform scale-100 transition-all animate-pop-in">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">{confirmDialog.title}</h3>
+            <p className="text-gray-600 mb-6">{confirmDialog.message}</p>
+            <div className="flex justify-center space-x-3">
+              <button 
+                onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition"
+              >
+                Tidak
+              </button>
+              <button 
+                onClick={() => {
+                  setConfirmDialog({ ...confirmDialog, isOpen: false });
+                  confirmDialog.onConfirm();
+                }}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

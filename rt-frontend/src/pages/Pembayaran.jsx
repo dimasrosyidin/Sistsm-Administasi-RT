@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 import api from '../api';
 import { exportToExcel, exportToPDF } from '../utils/export';
 import useTitle from '../utils/useTitle';
-import { Eye, Edit, Trash2, Plus } from 'lucide-react';
+import { Edit, Trash2, Search, CheckCircle, XCircle, Plus, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Pembayaran() {
   const location = useLocation();
@@ -121,11 +122,12 @@ export default function Pembayaran() {
     e.preventDefault();
     try {
       await api.post('/tagihan', formData);
+      toast.success('Tagihan Berhasil di Tambah');
       fetchTagihan();
       setShowAddModal(false);
       setFormData(defaultFormData);
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal menambahkan tagihan');
+      toast.error(error.response?.data?.message || 'Gagal menambahkan tagihan');
     }
   };
 
@@ -136,10 +138,11 @@ export default function Pembayaran() {
         nominal_kebersihan: formData.nominal_kebersihan,
         nominal_satpam: formData.nominal_satpam,
       });
+      toast.success('Tagihan Berhasil di Update');
       fetchTagihan();
       setShowEditModal(false);
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal mengedit tagihan');
+      toast.error(error.response?.data?.message || 'Gagal mengedit tagihan');
     }
   };
 
@@ -151,9 +154,11 @@ export default function Pembayaran() {
       onConfirm: async () => {
         try {
           await api.delete(`/tagihan/${id}`);
+          toast.success('Data Berhasil di Hapus');
           fetchTagihan();
         } catch (error) {
           console.error(error);
+          toast.error('Gagal menghapus tagihan');
         }
       }
     });
@@ -162,11 +167,13 @@ export default function Pembayaran() {
   const processPayment = async (id, jenis_iuran, periode_pembayaran = 'bulanan', action = 'bayar') => {
     try {
       await api.post(`/tagihan/${id}/bayar`, { jenis_iuran, periode_pembayaran, action });
+      toast.success('Pembayaran Berhasil di Update');
       fetchTagihan();
       setShowPaymentModal(false);
       setSelectedTagihan(null);
     } catch (error) {
       console.error(error);
+      toast.error('Gagal memproses pembayaran');
     }
   };
 
@@ -204,7 +211,7 @@ export default function Pembayaran() {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 animate-slide-down stagger-1">
         <h2 className="text-2xl font-bold text-gray-800">Pembayaran Iuran</h2>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <input 
@@ -248,7 +255,7 @@ export default function Pembayaran() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden animate-slide-down stagger-2">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
@@ -370,8 +377,8 @@ export default function Pembayaran() {
 
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <h3 className="text-xl font-bold mb-4">Tambah Tagihan Manual</h3>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl animate-pop-in">
+            <h3 className="text-xl font-bold mb-4">Tambah Tagihan Baru</h3>
             <form onSubmit={handleAddSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Rumah (Dihuni)</label>
@@ -421,7 +428,7 @@ export default function Pembayaran() {
 
       {showEditModal && selectedTagihan && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl animate-pop-in">
             <h3 className="text-xl font-bold mb-4">Edit Tagihan</h3>
             <p className="text-sm text-gray-500 mb-4">
               Edit nominal tagihan untuk Rumah <strong>{selectedTagihan.rumah?.nomor_rumah}</strong> periode {selectedTagihan.bulan}/{selectedTagihan.tahun}.
@@ -448,7 +455,7 @@ export default function Pembayaran() {
 
       {showViewModal && selectedTagihan && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl animate-pop-in">
             <h3 className="text-xl font-bold mb-4">Detail Tagihan</h3>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between border-b pb-2"><span className="text-gray-600">Nomor Rumah</span><span className="font-semibold">{selectedTagihan.rumah?.nomor_rumah}</span></div>
@@ -478,7 +485,7 @@ export default function Pembayaran() {
 
       {confirmDialog.isOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl text-center transform scale-100 transition-all">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl text-center transform scale-100 transition-all animate-pop-in">
             <h3 className="text-xl font-bold text-gray-800 mb-2">{confirmDialog.title}</h3>
             <p className="text-gray-600 mb-6">{confirmDialog.message}</p>
             <div className="flex justify-center space-x-3">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { Home, Users, Home as HomeIcon, CreditCard, Receipt, FileText } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Penghuni from './pages/Penghuni';
@@ -20,7 +21,7 @@ function Sidebar({ isOpen, setIsOpen }) {
       )}
 
       {/* Sidebar Content */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white h-screen border-r border-gray-200 flex flex-col transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-50 flex flex-col h-screen transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static`}>
         <div className="h-16 flex items-center px-6 border-b border-gray-200">
           <h1 className="text-xl font-bold text-blue-600">RT Admin</h1>
         </div>
@@ -85,7 +86,7 @@ function Layout({ children }) {
           </button>
           <h2 className="text-lg font-semibold text-gray-800">Sistem Administrasi RT</h2>
         </header>
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6 animate-fade-in">
           {children}
         </main>
       </div>
@@ -97,6 +98,7 @@ function App() {
   return (
     <Router>
       <Layout>
+        <Toaster position="top-right" />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/penghuni" element={<Penghuni />} />

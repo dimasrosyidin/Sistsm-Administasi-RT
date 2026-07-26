@@ -3,6 +3,7 @@ import api from '../api';
 import { exportToExcel, exportToPDF } from '../utils/export';
 import useTitle from '../utils/useTitle';
 import { Eye, Edit, Trash2, UserPlus } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Rumah() {
   useTitle('Data Rumah');
@@ -14,6 +15,13 @@ export default function Rumah() {
   const defaultFormData = { id: null, nomor_rumah: '', status_dihuni: 'Tidak Dihuni', penghuni_ids: [] };
   const [formData, setFormData] = useState(defaultFormData);
   const [historyData, setHistoryData] = useState([]);
+  
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
   
   const [filterStatus, setFilterStatus] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,13 +90,16 @@ export default function Rumah() {
     try {
       if (formData.id) {
         await api.put(`/rumah/${formData.id}`, formData);
+        toast.success('Data Rumah Berhasil di Update');
       } else {
         await api.post('/rumah', formData);
+        toast.success('Data Rumah Berhasil di Tambah');
       }
       setShowModal(false);
       fetchRumah();
     } catch (error) {
       console.error(error);
+      toast.error('Gagal menyimpan data');
     }
   };
 
@@ -103,19 +114,25 @@ export default function Rumah() {
   };
 
   const handleDelete = async (id) => {
-    if(confirm('Apakah Anda yakin ingin menghapus rumah ini?')) {
-      try {
-        await api.delete(`/rumah/${id}`);
-        fetchRumah();
-      } catch (error) {
-        alert(error.response?.data?.message || 'Gagal menghapus rumah');
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Rumah',
+      message: 'Apakah Anda yakin ingin menghapus rumah ini?',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/rumah/${id}`);
+          toast.success('Data Berhasil di Hapus');
+          fetchRumah();
+        } catch (error) {
+          toast.error(error.response?.data?.message || 'Gagal menghapus rumah');
+        }
       }
-    }
+    });
   };
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 animate-slide-down stagger-1">
         <h2 className="text-2xl font-bold text-gray-800">Data Rumah</h2>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <input 
@@ -146,7 +163,7 @@ export default function Rumah() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden animate-slide-down stagger-2">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
@@ -205,9 +222,9 @@ export default function Rumah() {
 
       {/* Modal Tambah/Edit */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <h3 className="text-xl font-bold mb-4">{formData.id ? 'Edit Rumah' : 'Tambah Rumah'}</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl animate-pop-in">
+            <h3 className="text-xl font-bold mb-4">{formData.id ? 'Edit Rumah' : 'Tambah Rumah Baru'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Rumah</label>
@@ -309,6 +326,33 @@ export default function Rumah() {
           </div>
         </div>
       )}
+
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl text-center transform scale-100 transition-all animate-pop-in">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">{confirmDialog.title}</h3>
+            <p className="text-gray-600 mb-6">{confirmDialog.message}</p>
+            <div className="flex justify-center space-x-3">
+              <button 
+                onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition"
+              >
+                Tidak
+              </button>
+              <button 
+                onClick={() => {
+                  setConfirmDialog({ ...confirmDialog, isOpen: false });
+                  confirmDialog.onConfirm();
+                }}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

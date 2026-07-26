@@ -111,7 +111,7 @@ export default function Dashboard() {
 
         <div 
           onClick={() => navigate('/penghuni')}
-          className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 transition"
+          className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 hover:scale-105 transform transition duration-300 animate-slide-down stagger-1"
         >
           <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
             <Users className="w-8 h-8" />
@@ -124,7 +124,7 @@ export default function Dashboard() {
 
         <div 
           onClick={() => navigate('/rumah')}
-          className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 transition"
+          className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 hover:scale-105 transform transition duration-300 animate-slide-down stagger-2"
         >
           <div className="p-3 bg-purple-100 text-purple-600 rounded-full">
             <Home className="w-8 h-8" />
@@ -139,7 +139,7 @@ export default function Dashboard() {
 
         <div 
           onClick={() => navigate('/tagihan', { state: { statusFilter: 'Belum Lunas', tahunFilter: new Date().getFullYear().toString() } })}
-          className="bg-red-50 p-6 rounded-lg shadow-sm border border-red-100 flex items-center justify-between cursor-pointer hover:bg-red-100 transition"
+          className="bg-red-50 p-6 rounded-lg shadow-sm border border-red-100 flex items-center justify-between cursor-pointer hover:bg-red-100 hover:scale-105 transform transition duration-300 animate-slide-down stagger-3"
         >
           <div>
             <h3 className="text-lg font-semibold text-red-700 mb-1">Belum Bayar Bulan Ini</h3>
@@ -150,9 +150,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-700">Ringkasan Keuangan {tahun === 'semua' ? '(Semua Tahun)' : `(Tahun ${tahun})`}</h3>
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 animate-slide-down stagger-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 animate-slide-down">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700">Ringkasan Keuangan {tahun === 'semua' ? '(Semua Tahun)' : `(Tahun ${tahun})`}</h3>
+          </div>
           <div className="flex items-center space-x-2">
             <label className="text-gray-600 text-sm font-medium">Filter Tahun:</label>
             <select 
