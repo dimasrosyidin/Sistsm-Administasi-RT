@@ -23,7 +23,6 @@ Jika Anda atau tim Anda mengunduh aplikasi ini dari Github, ikuti langkah beriku
 3. Di terminal kedua, masuk ke folder `rt-frontend` dan ketik: `npm run dev`
 4. Buka aplikasi *browser* (Google Chrome/Firefox) dan ketik alamat: **http://localhost:5173**
 
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Tampilan awal saat berhasil membuka http://localhost:5173 (Halaman Dashboard) ]`
 
 ### C. Mengakses Aplikasi dari HP atau Komputer Lain (Satu WiFi/LAN)
 Jika Anda ingin membuka aplikasi ini di HP atau laptop lain, ikuti cara ini:
@@ -47,8 +46,6 @@ Langkah pertama yang harus dilakukan adalah mendaftarkan warga yang tinggal di l
 3. Isikan data diri warga (Nama, Status Tetap/Kontrak, No. Telepon, dll). Anda juga bisa mengunggah foto KTP jika perlu.
 4. Klik **"Simpan"**.
 
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Form "Tambah Penghuni" yang sedang diisi data ]`
-
 *💡 Tips: Anda dapat mencari nama warga di kolom "Search" atau memilih opsi "Semua Status" di filter dropdown untuk menampilkan semua riwayat warga.*
 
 ---
@@ -61,8 +58,6 @@ Setelah warga terdaftar, langkah selanjutnya adalah menempatkan mereka ke dalam 
 4. Pilih penghuni (yang telah didaftarkan di Langkah 1) melalui kotak *dropdown*.
 5. Jika satu rumah diisi oleh lebih dari satu orang, klik tombol **"+ Tambah penghuni"** di bagian bawah, lalu pilih nama warga lainnya.
 6. Klik **"Simpan"**. Status rumah akan otomatis berubah menjadi "Dihuni".
-
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Form "Edit Rumah" yang menunjukkan dropdown pemilihan beberapa penghuni ]`
 
 *💡 Tips: Klik ikon "Mata" pada baris rumah untuk melihat sejarah (history) siapa saja yang pernah mengontrak atau menempati rumah tersebut di masa lalu.*
 
@@ -79,10 +74,6 @@ Tiba waktunya warga membayar iuran bulanan (Kebersihan & Satpam).
 5. Klik opsi yang sesuai, lalu klik **"Ya"** pada peringatan konfirmasi.
 6. Indikator baris akan berubah menjadi hijau (*Paid*).
 
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Tampilan pop-up Modal Pembayaran yang berisi tombol "Bayar Keduanya" dan "Bayar 1 Tahun" ]`
-
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Tampilan baris tagihan yang sudah berubah hijau (Paid) setelah dibayar ]`
-
 ---
 
 ### Langkah 4: Mencatat Pengeluaran Kas RT
@@ -92,7 +83,6 @@ Selain pemasukan, uang kas RT juga pasti digunakan untuk berbagai keperluan.
 3. Masukkan Keterangan (misal: "Honor Satpam Bulan Juli", "Beli Lampu Jalan", "Kerja Bakti") dan Jumlah Nominalnya.
 4. Klik **"Simpan"**. Uang ini akan secara otomatis memotong saldo akhir RT.
 
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Form pengisian "Tambah Pengeluaran" ]`
 
 ---
 
@@ -102,9 +92,6 @@ Setelah sistem berjalan (ada pemasukan dan pengeluaran), Anda bisa melihat hasil
 2. **Cetak Laporan (Print):** Klik tombol **"Export PDF"** atau **"Export Excel"** di halaman ini untuk mencetak pertanggungjawaban dana RT di akhir tahun.
 3. **Melihat Ringkasan (Dashboard):** Klik menu **"Dashboard"**. Di bagian ini Anda bisa melihat Grafik Keuangan Tahunan serta total Saldo Kas RT terkini secara visual.
 
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Tampilan halaman "Laporan Keuangan" lengkap dengan tabel per bulannya ]`
-
-`[ 📸 MASUKKAN SCREENSHOT DI SINI: Tampilan halaman "Dashboard" beserta Grafik visualnya ]`
 
 ---
 

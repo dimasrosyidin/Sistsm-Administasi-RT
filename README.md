@@ -44,7 +44,7 @@ Aplikasi ini dibuat menggunakan framework **Laravel 11** untuk Backend (API) dan
    ```bash
    php artisan migrate
    ```
-8. Buat symbolic link untuk folder storage (digunakan untuk menyimpan foto KTP):
+8. Buat symbolic link untuk folder storage. **Langkah ini WAJIB dilakukan agar foto KTP dapat ditampilkan di aplikasi**:
    ```bash
    php artisan storage:link
    ```
