@@ -181,6 +181,26 @@ class KeuanganController extends Controller
         return response()->json($pengeluaran, 201);
     }
 
+    public function updatePengeluaran(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'keterangan' => 'required|string',
+            'jumlah' => 'required|integer|min:0',
+            'tanggal' => 'required|date'
+        ]);
+
+        $pengeluaran = Pengeluaran::findOrFail($id);
+        $pengeluaran->update($validated);
+        return response()->json($pengeluaran);
+    }
+
+    public function destroyPengeluaran($id)
+    {
+        $pengeluaran = Pengeluaran::findOrFail($id);
+        $pengeluaran->delete();
+        return response()->json(['message' => 'Pengeluaran deleted successfully']);
+    }
+
     public function getSummary(Request $request)
     {
         $tahun = $request->query('tahun', date('Y'));

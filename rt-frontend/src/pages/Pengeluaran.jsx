@@ -2,12 +2,21 @@ import { useEffect, useState } from 'react';
 import api from '../api';
 import { exportToExcel, exportToPDF } from '../utils/export';
 import useTitle from '../utils/useTitle';
+import { Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Pengeluaran() {
   useTitle('Pengeluaran');
   const [pengeluaranList, setPengeluaranList] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ keterangan: '', jumlah: '', tanggal: '' });
+  const [formData, setFormData] = useState({ id: null, keterangan: '', jumlah: '', tanggal: '' });
+
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
 
   const [filterBulan, setFilterBulan] = useState('Semua');
   const [filterTahun, setFilterTahun] = useState('Semua');
@@ -80,18 +89,52 @@ export default function Pengeluaran() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/pengeluaran', formData);
+      if (formData.id) {
+        await api.put(`/pengeluaran/${formData.id}`, formData);
+        toast.success('Data Pengeluaran Berhasil di Update');
+      } else {
+        await api.post('/pengeluaran', formData);
+        toast.success('Data Pengeluaran Berhasil di Tambah');
+      }
       setShowModal(false);
-      setFormData({ keterangan: '', jumlah: '', tanggal: '' });
+      setFormData({ id: null, keterangan: '', jumlah: '', tanggal: '' });
       fetchPengeluaran();
     } catch (error) {
       console.error(error);
+      toast.error('Gagal menyimpan data pengeluaran');
     }
+  };
+
+  const handleEdit = (p) => {
+    setFormData({
+      id: p.id,
+      keterangan: p.keterangan,
+      jumlah: p.jumlah,
+      tanggal: p.tanggal
+    });
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Pengeluaran',
+      message: 'Apakah Anda yakin ingin menghapus data pengeluaran ini?',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/pengeluaran/${id}`);
+          toast.success('Data Berhasil di Hapus');
+          fetchPengeluaran();
+        } catch (error) {
+          toast.error('Gagal menghapus data pengeluaran');
+        }
+      }
+    });
   };
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 animate-slide-down stagger-1">
         <h2 className="text-2xl font-bold text-gray-800">Data Pengeluaran</h2>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <input 
@@ -127,13 +170,13 @@ export default function Pengeluaran() {
           <button onClick={handleExportPDF} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
             Export PDF
           </button>
-          <button onClick={() => setShowModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => { setFormData({ id: null, keterangan: '', jumlah: '', tanggal: '' }); setShowModal(true); }} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             + Catat Pengeluaran
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden animate-slide-down stagger-2">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
@@ -142,12 +185,13 @@ export default function Pengeluaran() {
               <th className="p-4">Tanggal</th>
               <th className="p-4">Keterangan</th>
               <th className="p-4">Jumlah (Rp)</th>
+              <th className="p-4 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {filteredPengeluaran.length === 0 ? (
               <tr>
-                <td colSpan="4" className="p-8 text-center text-gray-500 font-medium">No data entry</td>
+                <td colSpan="5" className="p-8 text-center text-gray-500 font-medium">No data entry</td>
               </tr>
             ) : (
               filteredPengeluaran.map((p, index) => (
@@ -156,6 +200,14 @@ export default function Pengeluaran() {
                   <td className="p-4">{p.tanggal}</td>
                 <td className="p-4">{p.keterangan}</td>
                 <td className="p-4 font-semibold text-red-600">{parseInt(p.jumlah).toLocaleString('id-ID')}</td>
+                <td className="p-4 text-center space-x-2">
+                  <button onClick={() => handleEdit(p)} className="p-2 text-blue-600 hover:bg-blue-50 rounded" title="Edit">
+                    <Edit className="w-5 h-5" />
+                  </button>
+                  <button onClick={() => handleDelete(p.id)} className="p-2 text-red-600 hover:bg-red-50 rounded" title="Hapus">
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </td>
               </tr>
             )))}
           </tbody>
@@ -164,9 +216,9 @@ export default function Pengeluaran() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
-            <h3 className="text-xl font-bold mb-4">Catat Pengeluaran Baru</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl animate-pop-in">
+            <h3 className="text-xl font-bold mb-4">{formData.id ? 'Edit Pengeluaran' : 'Catat Pengeluaran Baru'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
@@ -188,6 +240,33 @@ export default function Pengeluaran() {
           </div>
         </div>
       )}
+
+      {confirmDialog.isOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl text-center transform scale-100 transition-all animate-pop-in">
+            <h3 className="text-xl font-bold text-gray-800 mb-2">{confirmDialog.title}</h3>
+            <p className="text-gray-600 mb-6">{confirmDialog.message}</p>
+            <div className="flex justify-center space-x-3">
+              <button 
+                onClick={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+                className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition"
+              >
+                Tidak
+              </button>
+              <button 
+                onClick={() => {
+                  setConfirmDialog({ ...confirmDialog, isOpen: false });
+                  confirmDialog.onConfirm();
+                }}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold transition"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

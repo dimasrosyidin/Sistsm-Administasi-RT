@@ -26,6 +26,8 @@ Route::post('tagihan/{id}/bayar', [KeuanganController::class, 'bayarTagihan']);
 
 Route::get('pengeluaran', [KeuanganController::class, 'getPengeluaran']);
 Route::post('pengeluaran', [KeuanganController::class, 'storePengeluaran']);
+Route::put('pengeluaran/{id}', [KeuanganController::class, 'updatePengeluaran']);
+Route::delete('pengeluaran/{id}', [KeuanganController::class, 'destroyPengeluaran']);
 
 Route::get('summary', [KeuanganController::class, 'getSummary']);
 Route::get('summary/years', [KeuanganController::class, 'getAvailableYears']);
