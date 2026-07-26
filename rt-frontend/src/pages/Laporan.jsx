@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../api';
 import { exportToExcel, exportToPDF } from '../utils/export';
 import useTitle from '../utils/useTitle';
+import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 
 export default function Laporan() {
   useTitle('Laporan Keuangan');
@@ -46,9 +47,9 @@ export default function Laporan() {
     const data = summaryData.map((s, i) => ({
       No: i + 1,
       Bulan: monthNames[s.bulan - 1],
-      'Total Pemasukan (Rp)': s.pemasukan,
-      'Total Pengeluaran (Rp)': s.pengeluaran,
-      'Saldo (Rp)': s.saldo
+      'Total Pemasukan (Rp)': Number(s.pemasukan),
+      'Total Pengeluaran (Rp)': Number(s.pengeluaran),
+      'Saldo (Rp)': Number(s.saldo)
     }));
     exportToExcel(data, `Laporan_Keuangan_Tahun_${tahun}`);
   };
@@ -58,16 +59,19 @@ export default function Laporan() {
     const rows = summaryData.map((s, i) => [
       i + 1,
       monthNames[s.bulan - 1],
-      s.pemasukan.toLocaleString('id-ID'),
-      s.pengeluaran.toLocaleString('id-ID'),
-      s.saldo.toLocaleString('id-ID')
+      Number(s.pemasukan).toLocaleString('id-ID'),
+      Number(s.pengeluaran).toLocaleString('id-ID'),
+      Number(s.saldo).toLocaleString('id-ID')
     ]);
     exportToPDF(headers, rows, `Laporan_Keuangan_Tahun_${tahun}`, `Laporan Keuangan Tahun ${tahun}`);
   };
 
+  const totalPemasukanSum = summaryData.reduce((acc, curr) => acc + Number(curr.pemasukan || 0), 0);
+  const totalPengeluaranSum = summaryData.reduce((acc, curr) => acc + Number(curr.pengeluaran || 0), 0);
+
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 animate-slide-down stagger-1">
         <h2 className="text-2xl font-bold text-gray-800">Laporan Keuangan Bulanan</h2>
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <button onClick={handleExportExcel} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
@@ -91,14 +95,44 @@ export default function Laporan() {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-8">
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Total Saldo (Sisa) di Tahun {tahun}</h3>
-        <p className={`text-3xl font-bold ${totalSaldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          Rp {totalSaldo.toLocaleString('id-ID')}
-        </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 animate-slide-down stagger-2">
+        {/* Pemasukan */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4">
+          <div className="p-3 bg-green-100 text-green-600 rounded-full">
+            <TrendingUp className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Pemasukan</h3>
+            <p className="text-2xl font-bold text-gray-800">Rp {totalPemasukanSum.toLocaleString('id-ID')}</p>
+          </div>
+        </div>
+
+        {/* Pengeluaran */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4">
+          <div className="p-3 bg-red-100 text-red-600 rounded-full">
+            <TrendingDown className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Pengeluaran</h3>
+            <p className="text-2xl font-bold text-gray-800">Rp {totalPengeluaranSum.toLocaleString('id-ID')}</p>
+          </div>
+        </div>
+
+        {/* Saldo Akhir */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center space-x-4">
+          <div className="p-3 bg-blue-100 text-blue-600 rounded-full">
+            <Wallet className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Saldo (Sisa)</h3>
+            <p className={`text-2xl font-bold ${(totalPemasukanSum - totalPengeluaranSum) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              Rp {(totalPemasukanSum - totalPengeluaranSum).toLocaleString('id-ID')}
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden animate-slide-down stagger-3">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse whitespace-nowrap">
           <thead>
@@ -120,10 +154,10 @@ export default function Laporan() {
                 <tr key={s.bulan} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="p-4 text-gray-500">{index + 1}</td>
                   <td className="p-4 font-medium">{monthNames[s.bulan - 1]}</td>
-                <td className="p-4 text-green-600">{s.pemasukan.toLocaleString('id-ID')}</td>
-                <td className="p-4 text-red-600">{s.pengeluaran.toLocaleString('id-ID')}</td>
-                <td className={`p-4 font-semibold ${s.saldo >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {s.saldo.toLocaleString('id-ID')}
+                <td className="p-4 text-green-600">{Number(s.pemasukan).toLocaleString('id-ID')}</td>
+                <td className="p-4 text-red-600">{Number(s.pengeluaran).toLocaleString('id-ID')}</td>
+                <td className={`p-4 font-semibold ${Number(s.saldo) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {Number(s.saldo).toLocaleString('id-ID')}
                 </td>
               </tr>
             )))}
