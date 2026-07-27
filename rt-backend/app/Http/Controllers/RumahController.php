@@ -100,8 +100,11 @@ class RumahController extends Controller
 
     public function history($id)
     {
-        $rumah = Rumah::with('penghuni')->findOrFail($id);
-        return response()->json($rumah->penghuni);
+        $rumah = Rumah::with(['penghuni', 'tagihan.penghuni'])->findOrFail($id);
+        return response()->json([
+            'penghuni' => $rumah->penghuni,
+            'tagihan' => $rumah->tagihan
+        ]);
     }
 
     public function destroy($id)

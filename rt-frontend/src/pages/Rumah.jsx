@@ -14,7 +14,7 @@ export default function Rumah() {
   
   const defaultFormData = { id: null, nomor_rumah: '', status_dihuni: 'Tidak Dihuni', penghuni_ids: [] };
   const [formData, setFormData] = useState(defaultFormData);
-  const [historyData, setHistoryData] = useState([]);
+  const [historyData, setHistoryData] = useState({ penghuni: [], tagihan: [] });
   
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
@@ -309,7 +309,7 @@ export default function Rumah() {
                   </tr>
                 </thead>
                 <tbody>
-                  {historyData.map((h, index) => (
+                  {historyData.penghuni.map((h, index) => (
                     <tr key={h.pivot.id} className="border-b border-gray-100">
                       <td className="p-3 text-gray-500">{index + 1}</td>
                       <td className="p-3">{h.nama_lengkap}</td>
@@ -317,8 +317,45 @@ export default function Rumah() {
                       <td className="p-3">{h.pivot.tanggal_selesai || 'Sekarang'}</td>
                     </tr>
                   ))}
-                  {historyData.length === 0 && (
-                    <tr><td colSpan="3" className="p-4 text-center text-gray-500">Belum ada history.</td></tr>
+                  {historyData.penghuni.length === 0 && (
+                    <tr><td colSpan="4" className="p-4 text-center text-gray-500">Belum ada history penghuni.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            <h4 className="text-lg font-bold mt-6 mb-2 text-gray-700">History Pembayaran Tagihan</h4>
+            <div className="max-h-64 overflow-y-auto">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="p-3 w-12">No</th>
+                    <th className="p-3">Periode</th>
+                    <th className="p-3">Penghuni</th>
+                    <th className="p-3">Status Kebersihan</th>
+                    <th className="p-3">Status Satpam</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historyData.tagihan.map((t, index) => (
+                    <tr key={t.id} className="border-b border-gray-100">
+                      <td className="p-3 text-gray-500">{index + 1}</td>
+                      <td className="p-3">{t.bulan}/{t.tahun}</td>
+                      <td className="p-3">{t.penghuni ? t.penghuni.nama_lengkap : '-'}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${t.status_kebersihan === 'Lunas' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {t.status_kebersihan}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${t.status_satpam === 'Lunas' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {t.status_satpam}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {historyData.tagihan.length === 0 && (
+                    <tr><td colSpan="5" className="p-4 text-center text-gray-500">Belum ada history tagihan.</td></tr>
                   )}
                 </tbody>
               </table>
