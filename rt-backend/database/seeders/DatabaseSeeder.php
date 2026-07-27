@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Penghuni;
 use App\Models\Rumah;
 use App\Models\Tagihan;
@@ -17,11 +16,7 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        // 1. Setup Admin
-        User::factory()->create([
-            'name' => 'Admin RT',
-            'email' => 'admin@rt.local',
-        ]);
+        // No Admin User needed
 
         $faker = \Faker\Factory::create('id_ID');
         $now = Carbon::now();
